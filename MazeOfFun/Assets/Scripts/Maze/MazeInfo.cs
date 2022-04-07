@@ -7,12 +7,14 @@ public class MazeInfo
     public static MazeInfo mazeInfo;
 
     public MazeSquare[,] squaresInfo;
-    
+    private int _squareSize;
+
     /// <summary>
     /// Create a maze info using singleton pattern. 
     /// </summary>
-    /// <param name="level">The value should be greater than zero. </param>
-    public MazeInfo(int level)
+    /// <param name="level">Player level. The value should be greater than zero. </param>
+    /// <param name="squareSize">Square size of the maze. The value should be greater than zero. </param>
+    public MazeInfo(int level, int squareSize)
     {
         // Syncronization to avoid the creation of two mazes at the same time
         lock(this)
@@ -20,16 +22,75 @@ public class MazeInfo
             // Singleton pattern
             if(mazeInfo == null && level > 0)
             {
-                _InitialiseMazeSquaresInfo(level);
+                _InitialiseMazeSquaresInfo(level + 2, squareSize);
+                _squareSize = squareSize;
                 mazeInfo = this;
             }
         }
     }
 
-
-    private void _InitialiseMazeSquaresInfo(int level)
+    /// <summary>
+    /// Creates the squares info with their default setting initilized.
+    /// </summary>
+    /// <param name="mazeSize">The size of the maze. </param>
+    /// <param name="squareSize">The size of the square. </param>
+    private void _InitialiseMazeSquaresInfo(int mazeSize, int squareSize)
     {
-        squaresInfo = new MazeSquare[level, level];
+        squaresInfo = new MazeSquare[mazeSize, mazeSize];
+
+        // Create the squares
+        for(int x = 0; x < mazeSize; x++)
+        {
+            for(int y = 0; y < mazeSize; y++)
+            {
+                // Check for the cornors start
+                // -----------------------------------
+                if(x == 0 && y == 0)
+                { // TOP_LEFT_CORNOR
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.TOP_LEFT_CORNOR, x, y);
+                }
+                else if(x + 1 == mazeSize && y == 0)
+                { // TOP_RIGHT_CORNOR
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.TOP_RIGHT_CORNOR, x, y);
+                }
+                else if(x + 1 == mazeSize && y + 1 == mazeSize)
+                { // BOTTOM_RIGHT_CORNOR
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.BOTTOM_RIGHT_CORNOR, x, y);
+                }
+                else if(x == 0 && y + 1 == mazeSize)
+                { // BOTTOM_LEFT_CORNOR
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.BOTTOM_LEFT_CORNOR, x, y);
+                }
+                // -----------------------------------
+                // Check for the cornors end
+
+                // Check for the borders start
+                // -----------------------------------
+                else if (x == 0)
+                { // LEFT_BORDER NOT CORNORS
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.LEFT_BORDER, x, y);
+                }
+                else if (y == 0)
+                { // TOP_BORDER NOT CORNORS
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.TOP_BORDER, x, y);
+                }
+                else if (x + 1 == mazeSize)
+                { // RIGHT_BORDER NOT CORNORS
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.RIGHT_BORDER, x, y);
+                }
+                else if (y + 1 == mazeSize)
+                { // BOTTOM_BORDER NOT CORNORS
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.BOTTOM_BORDER, x, y);
+                }
+                // -----------------------------------
+                // Check for the borders end
+
+                else
+                { // NOT CORNOR NOT BORDER
+                    squaresInfo[x, y] = new MazeSquare(squareSize, squareSize, SquarePosition.CENTER, x, y);
+                }
+            }
+        }
     }
 
     
