@@ -8,7 +8,7 @@ public class AmbientLight : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InputControl
+        
     }
 
     // Update is called once per frame

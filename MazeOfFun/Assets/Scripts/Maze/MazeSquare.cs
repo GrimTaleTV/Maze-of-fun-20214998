@@ -17,7 +17,7 @@ public enum SquarePosition: byte
 }
 
 
-public class MazeSquare : MonoBehaviour
+public class MazeSquare
 {
     // Initializing defualt info
     //-------------------------------------
@@ -295,7 +295,7 @@ public class MazeSquare : MonoBehaviour
 
     public bool IsWallOpen(Wall wallDirection)
     {
-        bool isOpen = false;
+        bool isOpen = true;
 
         // TODO: Check if this needs to be uncommented
         /*switch(wallDirection)
@@ -388,10 +388,12 @@ public class MazeSquare : MonoBehaviour
                 // Get the location of the sqaure this direction is pointing towards
                 Vector2Int nextSquareLocation = GetSquareAtDirection(_wallsDirections[i]);
 
+                // Debug.Log(MazeInfo.mazeInfo.squaresInfo.GetLength(1));
+
                 // Not necessary check
                 // Check if this location exists
                 if (nextSquareLocation.x < 0 || nextSquareLocation.x >= MazeInfo.mazeInfo.squaresInfo.GetLength(0)
-                    || nextSquareLocation.y < 0 || nextSquareLocation.x >= MazeInfo.mazeInfo.squaresInfo.GetLength(1))
+                    || nextSquareLocation.y < 0 || nextSquareLocation.y >= MazeInfo.mazeInfo.squaresInfo.GetLength(1))
                 { // Location out of bounds
 
                 }
@@ -420,6 +422,8 @@ public class MazeSquare : MonoBehaviour
 
                             // Add the new unchoosen direction
                             newArray[newArray.Length - 1] = _wallsDirections[i];
+                            // Assign the new unchoosen directions to the main array
+                            unchoosenDirections = newArray;
                         }
                     }
                 }
@@ -446,13 +450,13 @@ public class MazeSquare : MonoBehaviour
                 location.x -= 1;
                 break;
             case Wall.TOP:
-                location.y += 1;
+                location.y -= 1;
                 break;
             case Wall.RIGHT:
                 location.x += 1;
                 break;
             case Wall.BOTTOM:
-                location.y -= 1;
+                location.y += 1;
                 break;
         }
 
