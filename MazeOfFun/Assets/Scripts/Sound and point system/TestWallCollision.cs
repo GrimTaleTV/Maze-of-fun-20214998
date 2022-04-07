@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollisionSound : MonoBehaviour
+public class TestWallCollision : MonoBehaviour
 {
     [SerializeField] private AudioClip _clip;
 
@@ -10,7 +10,7 @@ public class CollisionSound : MonoBehaviour
     {
         if (collision.gameObject.tag == "Wall")
         {
-            SoundManager.Instance.PlaySound(_clip);
+            TestSoundManager.Instance.PlaySound(_clip);
         }
     }
 }

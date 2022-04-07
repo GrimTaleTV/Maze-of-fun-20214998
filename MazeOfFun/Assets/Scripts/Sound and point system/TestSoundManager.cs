@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SoundManager : MonoBehaviour
+public class TestSoundManager : MonoBehaviour
 {
-    public static SoundManager Instance;
+    public static TestSoundManager Instance;
     [SerializeField] private AudioSource _musicSouce, _effectSource;
 
     private void Awake()
@@ -14,6 +14,7 @@ public class SoundManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+        else
         {
             Destroy(gameObject);
         }
