@@ -1,14 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 public class GyroscopeBehaviour : MonoBehaviour
 {
 
     private bool gyroEnabled;
-    private Gyroscope gyro;
+    private UnityEngine.InputSystem.Gyroscope gyro;
 
-    public float rollSpeed = 10;
     float MaxAngle = 35;
 
     private Quaternion quatRot;
@@ -23,11 +22,16 @@ public class GyroscopeBehaviour : MonoBehaviour
 
     private bool EnabledGryo()
     {
-        if (SystemInfo.supportsGyroscope)
+        if (UnityEngine.InputSystem.Gyroscope.current != null)
         {
-            gyro = Input.gyro;
-            gyro.enabled = true;
+            gyro = UnityEngine.InputSystem.Gyroscope.current;
+            InputSystem.EnableDevice(gyro);
             return true;
+        }
+
+        if(GravitySensor.current != null)
+        {
+            InputSystem.EnableDevice(GravitySensor.current);
         }
 
         return false;
@@ -37,8 +41,8 @@ public class GyroscopeBehaviour : MonoBehaviour
     private void Update()
     {
         Vector3 rotation = new Vector3(); ;
-        rotation.x = quatRot.x * MaxAngle;
-        rotation.y = quatRot.y * MaxAngle;
+        rotation.x = GravitySensor.current.gravity.ReadValue().x * MaxAngle;
+        rotation.y = GravitySensor.current.gravity.ReadValue().y * MaxAngle;
 
         transform.eulerAngles = rotation;
     }
