@@ -337,35 +337,96 @@ public class MazeSquare : MonoBehaviour
         return isOpen;
     }
 
+    public Wall GetOppositeWall(Wall direction)
+    {
+        Wall oppositeWall = Wall.NONE;
 
+        switch(direction)
+        {
+            case Wall.LEFT:
+                oppositeWall = Wall.RIGHT;
+                break;
+            case Wall.TOP:
+                oppositeWall = Wall.BOTTOM;
+                break;
+            case Wall.RIGHT:
+                oppositeWall = Wall.LEFT;
+                break;
+            case Wall.BOTTOM:
+                oppositeWall = Wall.TOP;
+                break;
+        }
+
+        return oppositeWall;
+    }
+
+    private static Wall[] _wallsDirections = new Wall[]
+    {
+        Wall.LEFT,
+        Wall.TOP,
+        Wall.RIGHT,
+        Wall.BOTTOM
+    };
 
     public Wall[] GetUnchoosenDirections()
     {
+        Wall[] unchoosenDirections = null;
 
         // Check if the left wall is open
         bool leftWall = IsWallOpen(Wall.LEFT);
 
-        // If this direction is not closed check if the square in the left
-        // has a direction pointing toward this one
-        if(leftWall)
+        // Loop around all the walls and check if they are open
+        for(int i = 0; i < _wallsDirections.Length; i++)
         {
-            // Get the location of the sqaure this direction is pointing towards
-            Vector2Int nextSquareLocation = GetSquareAtDirection(Wall.LEFT);
-            
-            // Not necessary check
-            // Check if this location exists
-            if(nextSquareLocation.x < 0 || nextSquareLocation.y < 0)
+            // Check if a this wall is open
+            bool isWallOpen = IsWallOpen(_wallsDirections[i]);
+
+            // If this direction is not closed check if the square in the left
+            // has a direction pointing toward this one
+            if (isWallOpen)
             {
+                // Get the location of the sqaure this direction is pointing towards
+                Vector2Int nextSquareLocation = GetSquareAtDirection(_wallsDirections[i]);
 
-            }
-            else
-            { // There is a square next to this one
-                // Check the opposite wall of the next square
-                // |This Square ->||<- Opposite wall of next square|
+                // Not necessary check
+                // Check if this location exists
+                if (nextSquareLocation.x < 0 || nextSquareLocation.x >= MazeInfo.mazeInfo.squaresInfo.GetLength(0)
+                    || nextSquareLocation.y < 0 || nextSquareLocation.x >= MazeInfo.mazeInfo.squaresInfo.GetLength(1))
+                { // Location out of bounds
 
+                }
+                else
+                { // There is a square next to this one
+                  // Check the opposite wall of the next square
+                  // |This Square ->||<- Opposite wall of next square|
+                    MazeSquare nextSquare =
+                        MazeInfo.mazeInfo.squaresInfo[nextSquareLocation.x, nextSquareLocation.y];
+                    if(GetOppositeWall(_wallsDirections[i]) != nextSquare.GetOpenDirection())
+                    { // An open direction was found
+                        // The next square open is pointing to another square than this one
+                        if(unchoosenDirections == null)
+                        { // This is the first unchoosenDirection that were found
+                            unchoosenDirections = new Wall[] { _wallsDirections[i] };
+                        }
+                        else
+                        { // There is other unchoosenDirection that were found
+                            Wall[] newArray = new Wall[unchoosenDirections.Length + 1];
+                            
+                            // Save the old unchoosen direction to the array
+                            for(int wallI = 0; wallI < unchoosenDirections.Length; wallI++)
+                            {
+                                newArray[wallI] = unchoosenDirections[wallI];
+                            }
+
+                            // Add the new unchoosen direction
+                            newArray[newArray.Length - 1] = _wallsDirections[i];
+                        }
+                    }
+                }
             }
         }
-        return null;
+        
+        return unchoosenDirections;
     }
 
 
