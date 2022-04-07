@@ -17,12 +17,12 @@ public class GyroscopeBehaviour : MonoBehaviour
     {
 
 
-        gyroEnabled = EnabledGyro();
+        gyroEnabled = EnabledGryo();
     }
 
     private bool EnabledGryo()
     {
-        if (SystemInfo.supportGyroscope)
+        if (SystemInfo.supportsGyroscope)
         {
             gyro = Input.gyro;
             gyro.enabled = true;
