@@ -11,7 +11,7 @@ public class GyroscopeBehaviour : MonoBehaviour
     public float rollSpeed = 10;
     float MaxAngle = 35;
 
-    private Quaternion rotation;
+    private Quaternion quatRot;
 
     // Start is called before the first frame update
     void Start()
@@ -37,8 +37,8 @@ public class GyroscopeBehaviour : MonoBehaviour
     private void Update()
     {
         Vector3 rotation = new Vector3(); ;
-        rotation.x = gyro.gravity.x * MaxAngle;
-        rotation.y = gyro.gravity.y * MaxAngle;
+        rotation.x = quatRot.x * MaxAngle;
+        rotation.y = quatRot.y * MaxAngle;
 
         transform.eulerAngles = rotation;
     }
