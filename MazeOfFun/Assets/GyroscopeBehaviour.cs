@@ -15,8 +15,6 @@ public class GyroscopeBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
-
         gyroEnabled = EnabledGryo();
     }
 
