@@ -9,7 +9,7 @@ public class MazeCreator : MonoBehaviour
     public GameObject horWall;
     public GameObject verWall;
     public GameObject floor;
-    private int level = 2;
+    public static int level = 2;
 
     // Start is called before the first frame update
     void Start()
