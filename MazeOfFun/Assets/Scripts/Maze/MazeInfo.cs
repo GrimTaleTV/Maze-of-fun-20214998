@@ -5,10 +5,14 @@ using UnityEngine;
 public class MazeInfo
 {
     public static MazeInfo mazeInfo;
+    public static readonly int MAZE_EXTRA_SIZE = 3;
 
     public MazeSquare[,] squaresInfo;
     public float squareSize { get; private set; }
     public int mazeSize { get; private set; }
+
+    public static Vector2Int playerStartSquareLocation;
+    public static Vector2Int exitSquareLocation;
 
     /// <summary>
     /// Create a maze info using singleton pattern. 
@@ -23,7 +27,7 @@ public class MazeInfo
             // Singleton pattern
             if(mazeInfo == null && level > 0)
             {
-                mazeSize = level + 2;
+                mazeSize = level + MAZE_EXTRA_SIZE;
                 _InitialiseMazeSquaresInfo(mazeSize, squareSize);
                 this.squareSize = squareSize;
                 mazeInfo = this;
@@ -95,5 +99,25 @@ public class MazeInfo
         }
     }
 
-    
+    public static Vector2 GetSequareCenterPosition(Vector2Int squareIndex)
+    {
+        Debug.Log("Square Index: " + squareIndex);
+        float squareSize = mazeInfo.squareSize;
+        float groundSize = squareSize * mazeInfo.mazeSize;
+        float x = squareSize / 2 + (squareIndex.x * squareSize) - groundSize / 2;
+        float y = squareSize / 2 + (squareIndex.y * squareSize) - groundSize / 2;
+
+        Debug.Log("Square Center Position: (" + x + ", " + y + ")" );
+        return new Vector2(x, y);
+    }
+
+    public static Vector2 GetPlayerStartPosition()
+    {
+        return GetSequareCenterPosition(playerStartSquareLocation);
+    }
+
+    public static Vector2 GetExitPosition()
+    {
+        return GetSequareCenterPosition(exitSquareLocation);
+    }
 }
