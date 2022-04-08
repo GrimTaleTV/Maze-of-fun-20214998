@@ -29,6 +29,7 @@ public class MazeSquare
 
     // Open Direction
     private Wall _openDirection = Wall.NONE;
+    public bool hasBeenFound = false;
 
     // Closed Directions
     private Wall[] _closedDirections;
@@ -378,6 +379,13 @@ public class MazeSquare
         // Loop around all the walls and check if they are open
         for(int i = 0; i < _wallsDirections.Length; i++)
         {
+            /* This important to avoid choosing the same direction
+             * in case the maze creator has reached deadend and returned
+             * back to this square to choose another road */
+            // Check if this wall direction is chosen
+            if (_wallsDirections[i] == _openDirection)
+                continue;
+
             // Check if a this wall is open
             bool isWallOpen = IsWallOpen(_wallsDirections[i]);
 
@@ -403,7 +411,8 @@ public class MazeSquare
                   // |This Square ->||<- Opposite wall of next square|
                     MazeSquare nextSquare =
                         MazeInfo.mazeInfo.squaresInfo[nextSquareLocation.x, nextSquareLocation.y];
-                    if(GetOppositeWall(_wallsDirections[i]) != nextSquare.GetOpenDirection())
+                    // Check if the next area was already found before
+                    if(/*GetOppositeWall(_wallsDirections[i]) != */nextSquare.GetOpenDirection() == Wall.NONE)
                     { // An open direction was found
                         // The next square open is pointing to another square than this one
                         if(unchoosenDirections == null)
