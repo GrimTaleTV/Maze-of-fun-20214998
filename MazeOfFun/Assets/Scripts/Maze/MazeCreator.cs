@@ -55,6 +55,30 @@ public class MazeCreator : MonoBehaviour
 
 
         // Generate and Create Eggs
+        //------------------------------
+        GameObject point = GameObject.FindGameObjectWithTag("Point");
+
+
+        for(int i = 0; i < MazeInfo.mazeInfo.mazeSize / 4; i++)
+        {
+            Vector2Int squareLocation = new Vector2Int(
+            UnityEngine.Random.Range(0, MazeInfo.mazeInfo.mazeSize),
+            UnityEngine.Random.Range(0, MazeInfo.mazeInfo.mazeSize)
+            );
+
+            Vector2 squareCoordinate = MazeInfo.GetSequareCenterPosition(squareLocation);
+
+            GameObject pointClone = Instantiate(point);
+            Vector3 clonedCoordinate = new Vector3(
+                squareCoordinate.x,
+                pointClone.transform.position.y,
+                squareCoordinate.y
+                );
+            pointClone.transform.position = clonedCoordinate;
+        }
+        
+
+        
     }
 
     private void _OpenWalls()
