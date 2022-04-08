@@ -11,13 +11,15 @@ public class MazeCreator : MonoBehaviour
     public GameObject verWall;
     public GameObject floor;
 
-    public static int level = 2;
+    private int _squareSize = 3;
+
+    public static int level = 50;
 
     // Start is called before the first frame update
     void Awake()
     {
         Vector3 floorScale = 
-            new Vector3(level * MazeInfo.MAZE_EXTRA_SIZE, 1, level * MazeInfo.MAZE_EXTRA_SIZE);
+            new Vector3((level + MazeInfo.MAZE_EXTRA_SIZE) * _squareSize, 1, (level + MazeInfo.MAZE_EXTRA_SIZE) * _squareSize);
         floor.transform.localScale = floorScale;
         float floorSize = floor.transform.localScale.x;
         // Debug.Log(LightSensor.current.lightLevel.scaleFactor);
@@ -53,6 +55,30 @@ public class MazeCreator : MonoBehaviour
 
 
         // Generate and Create Eggs
+        //------------------------------
+        GameObject point = GameObject.FindGameObjectWithTag("Point");
+
+
+        for(int i = 0; i < MazeInfo.mazeInfo.mazeSize / 4; i++)
+        {
+            Vector2Int squareLocation = new Vector2Int(
+            UnityEngine.Random.Range(0, MazeInfo.mazeInfo.mazeSize),
+            UnityEngine.Random.Range(0, MazeInfo.mazeInfo.mazeSize)
+            );
+
+            Vector2 squareCoordinate = MazeInfo.GetSequareCenterPosition(squareLocation);
+
+            GameObject pointClone = Instantiate(point);
+            Vector3 clonedCoordinate = new Vector3(
+                squareCoordinate.x,
+                pointClone.transform.position.y,
+                squareCoordinate.y
+                );
+            pointClone.transform.position = clonedCoordinate;
+        }
+        
+
+        
     }
 
     private void _OpenWalls()

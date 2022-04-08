@@ -9,22 +9,15 @@ public class UIControler : MonoBehaviour
 
     public GameObject activeMenu;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
 
     public void AdjustDifficulty(Slider difficultySlider)
     {
         MazeCreator.level = (int)difficultySlider.value;
+    }
+
+    public void AdjustVolume(Slider volumeSlider)
+    {
+        TestSoundManager.Volume = volumeSlider.value;
     }
 
     public void OpenMenu(GameObject menu)
