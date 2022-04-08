@@ -9,16 +9,16 @@ public class GyroscopeBehaviour : MonoBehaviour
     private UnityEngine.Gyroscope gyro;
 
     float MaxAngle = 35;
-    float speed = 10;
-    private Rigidbody _body;
-
+    float speed = 0.2f;
+    //private Rigidbody _body;
+    private CharacterController _body;
     private Quaternion quatRot;
 
     // Start is called before the first frame update
     void Start()
     {
-        _body = GetComponent<Rigidbody>();
-
+        //_body = GetComponent<Rigidbody>();
+        _body = GetComponent<CharacterController>();
         gyroEnabled = EnabledGryo();
     }
 
@@ -34,7 +34,7 @@ public class GyroscopeBehaviour : MonoBehaviour
         {
             gyro = Input.gyro;
             gyro.enabled = true;
-            Debug.LogError("Enabled");
+            // Debug.LogError("Enabled");
         }
 
 
@@ -53,10 +53,12 @@ public class GyroscopeBehaviour : MonoBehaviour
             rotation = rotation.normalized * speed;
 
             // Debug.Log("X: " + rotation.x + ", Y" + rotation.y);
-            Debug.Log(rotation);
+            // Debug.Log(rotation);
         }
 
-        if(Mathf.Abs(_body.velocity.magnitude) < speed)
-            _body.velocity += rotation * Time.deltaTime;
+        //if (Mathf.Abs(_body.velocity.magnitude) < speed)
+            //_body.velocity += rotation * Time.deltaTime;
+            _body.Move(rotation);
+        //Debug.Log(_body.velocity.magnitude);
     }
 }

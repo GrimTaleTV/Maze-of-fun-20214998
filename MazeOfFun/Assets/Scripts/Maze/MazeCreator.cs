@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,47 +10,49 @@ public class MazeCreator : MonoBehaviour
     public GameObject horWall;
     public GameObject verWall;
     public GameObject floor;
+
     public static int level = 2;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        Vector3 floorScale = 
+            new Vector3(level * MazeInfo.MAZE_EXTRA_SIZE, 1, level * MazeInfo.MAZE_EXTRA_SIZE);
+        floor.transform.localScale = floorScale;
         float floorSize = floor.transform.localScale.x;
         // Debug.Log(LightSensor.current.lightLevel.scaleFactor);
-        new MazeInfo( level, (floorSize / (level + 2)) );
-        MazeInfo mazeInfo = MazeInfo.mazeInfo;
+        new MazeInfo( level, (floorSize / (level + MazeInfo.MAZE_EXTRA_SIZE)) );
+        // MazeInfo mazeInfo = MazeInfo.mazeInfo;
 
         _CreateEnvoirement();
         _CreateMaze();
         _OpenWalls();
+        _PrepareEnvoirement();
+    }
 
-        // Print the maze info
-        /*for (int x = 0; x < mazeInfo.squaresInfo.GetLength(0); x++)
+    private void _PrepareEnvoirement()
+    {
+        // Player start
+        //------------------------------
+        // Get the player
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        // Check if an object with the tag Player were found
+        if (player != null)
         {
-            for(int y = 0; y < mazeInfo.squaresInfo.GetLength(1); y++)
-            {
-                Wall[] walls = mazeInfo.squaresInfo[x, y].GetUnchoosenDirections();
-
-                if(walls != null)
-                {
-                    Wall direction = walls[Random.Range(0, walls.Length)];
-                    mazeInfo.squaresInfo[x, y].AssignOpenDirection(direction);
-                    Debug.Log("X: " + x + ", Y: " + y + ", Dir: " + _GetDirectionWallName(direction));
-                    RemoveWall(x, y, direction);
-                }
-
-                walls = mazeInfo.squaresInfo[x, y].GetUnchoosenDirections();
-                //Debug.Log("X: " + x + ", Y: " + y 
-                 //   + ", Wall: ");
-                
-                /*for(int i = 0; i < walls.Length; i++)
-                {
-                    Debug.Log( _GetDirectionWallName(walls[i]) );
-                }
-            }
-        }*/
+            // Get the player start square position
+            Vector2 playerPos = MazeInfo.GetPlayerStartPosition();
+            // Move the player to the center of the start square pos
+            player.transform.position = 
+                new Vector3(playerPos.x, player.transform.position.y, playerPos.y);
+        }
+        else
+            throw new NullReferenceException("No Object Was Found With the Tag Player");
+        //------------------------------
+        // Player end
 
 
+        // Generate and Create Eggs
     }
 
     private void _OpenWalls()
@@ -68,7 +71,7 @@ public class MazeCreator : MonoBehaviour
                 {
                     // Wall direction = walls[Random.Range(0, walls.Length)];
                     mazeInfo.squaresInfo[x, y].AssignOpenDirection(dir);
-                    Debug.Log("X: " + x + ", Y: " + y + ", Dir: " + _GetDirectionWallName(dir));
+                    // Debug.Log("X: " + x + ", Y: " + y + ", Dir: " + _GetDirectionWallName(dir));
                     RemoveWall(x, y, dir);
                 }
                 else
@@ -124,23 +127,27 @@ public class MazeCreator : MonoBehaviour
 
         // Choose start location
         Vector2Int start = new Vector2Int(
-            Random.Range(0, mazeInfo.mazeSize),
-            Random.Range(0, mazeInfo.mazeSize)
+            UnityEngine.Random.Range(0, mazeInfo.mazeSize),
+            UnityEngine.Random.Range(0, mazeInfo.mazeSize)
             );
 
         // Choose end location
-        Vector2Int end = new Vector2Int(
-            Random.Range(0, mazeInfo.mazeSize),
-            Random.Range(0, mazeInfo.mazeSize)
+        Vector2Int exit = new Vector2Int(
+            UnityEngine.Random.Range(0, mazeInfo.mazeSize),
+            UnityEngine.Random.Range(0, mazeInfo.mazeSize)
             );
 
-        while(start.x == end.x && start.y == end.y)
+        while(start.x == exit.x && start.y == exit.y)
         {
-            end = new Vector2Int(
-            Random.Range(0, mazeInfo.mazeSize),
-            Random.Range(0, mazeInfo.mazeSize)
+            exit = new Vector2Int(
+            UnityEngine.Random.Range(0, mazeInfo.mazeSize),
+            UnityEngine.Random.Range(0, mazeInfo.mazeSize)
             );
         }
+
+        // Assign the start and exit to the maze info
+        MazeInfo.playerStartSquareLocation = start;
+        MazeInfo.exitSquareLocation = exit;
 
         int foundSquares = 0;
 
@@ -160,7 +167,7 @@ public class MazeCreator : MonoBehaviour
             { // This square has open closed walls that can be opened
 
                 // Chosse one of the openings
-                Wall dir = openWalls[Random.Range(0, openWalls.Length)];
+                Wall dir = openWalls[UnityEngine.Random.Range(0, openWalls.Length)];
 
                 // Add this square location to the tracker
                 tracker.Add(squareLocation);
@@ -205,6 +212,20 @@ public class MazeCreator : MonoBehaviour
 
                 if (!squareInfo.hasBeenFound)
                 { // New Area With All Walls Opened
+
+                    // Check if this square is isolated -> none square has opening to it.
+                    if(!squareInfo.hasOpenDirection())
+                    { // Isolated square has been fround
+                        //Debug.LogError("A Square that has no opening were found\n"
+                          //             + "X: " + squareLocation.x + ", Y: " + squareLocation.y);
+                        
+                        /* Some times a square without open direction
+                         * get none of the squares around it point towards it
+                         * to avoid that, this code is added to ensure none of the
+                         * squares is fully isolated from the rest of the squares */
+                        // Force assigning an open direction to this square
+                        squareInfo.ForceAssignRandomOpenDirection();
+                    }
 
                     // Count this area as founded
                     // Indicate that a new square were found
