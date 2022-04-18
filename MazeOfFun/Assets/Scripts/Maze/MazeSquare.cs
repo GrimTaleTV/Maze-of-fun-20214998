@@ -175,10 +175,11 @@ public class MazeSquare
     /// </summary>
     public void ForceAssignRandomOpenDirection()
     {
-        bool hasChoseDir = true;
+        bool hasChoseDir;
         Wall dir;
         do
         {
+            hasChoseDir = true;
             dir = _wallsDirections[UnityEngine.Random.Range(0, _wallsDirections.Length)];
             if (_closedDirections != null)
             { // There is some borders that closed some of the directions
