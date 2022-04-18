@@ -29,6 +29,7 @@ public class MazeSquare
 
     // Open Direction
     private Wall _openDirection = Wall.NONE;
+    public bool hasBeenFound = false;
 
     // Closed Directions
     private Wall[] _closedDirections;
@@ -169,6 +170,33 @@ public class MazeSquare
         _openDirection = direction;
     }
 
+    /// <summary>
+    /// Force assigning a random open direction.
+    /// </summary>
+    public void ForceAssignRandomOpenDirection()
+    {
+        bool hasChoseDir = true;
+        Wall dir;
+        do
+        {
+            dir = _wallsDirections[UnityEngine.Random.Range(0, _wallsDirections.Length)];
+            if (_closedDirections != null)
+            { // There is some borders that closed some of the directions
+                for (int i = 0; i < _closedDirections.Length; i++)
+                {
+                    if (dir == _closedDirections[i])
+                    {
+                        hasChoseDir = false;
+                        break;
+                    }
+                }
+            }
+
+
+        } while (!hasChoseDir);
+
+        AssignOpenDirection(dir);
+    }
 
     /// <summary>
     /// Get the open direction of this square. 
@@ -378,6 +406,13 @@ public class MazeSquare
         // Loop around all the walls and check if they are open
         for(int i = 0; i < _wallsDirections.Length; i++)
         {
+            /* This important to avoid choosing the same direction
+             * in case the maze creator has reached deadend and returned
+             * back to this square to choose another road */
+            // Check if this wall direction is chosen
+            if (_wallsDirections[i] == _openDirection)
+                continue;
+
             // Check if a this wall is open
             bool isWallOpen = IsWallOpen(_wallsDirections[i]);
 
@@ -403,7 +438,8 @@ public class MazeSquare
                   // |This Square ->||<- Opposite wall of next square|
                     MazeSquare nextSquare =
                         MazeInfo.mazeInfo.squaresInfo[nextSquareLocation.x, nextSquareLocation.y];
-                    if(GetOppositeWall(_wallsDirections[i]) != nextSquare.GetOpenDirection())
+                    // Check if the next area was already found before
+                    if(/*GetOppositeWall(_wallsDirections[i]) != */nextSquare.GetOpenDirection() == Wall.NONE)
                     { // An open direction was found
                         // The next square open is pointing to another square than this one
                         if(unchoosenDirections == null)
@@ -461,6 +497,48 @@ public class MazeSquare
         }
 
         return location;
+    }
+
+    /// <summary>
+    /// Checks if at least one of the squares around this one
+    /// has their open direction pointing towards this one.
+    /// </summary>
+    /// <returns>Whether there is a square pointing towards this area. </returns>
+    public bool HasSquarePointingToward()
+    {
+        bool hasSquarePointingAtIt = false;
+
+        // Run around all the open directions.
+        for(int i = 0; i < _wallsDirections.Length; i++)
+        {
+            Wall dir = _wallsDirections[i];
+            // Get the position of the square that this direction is pointing towards
+            Vector2Int squareAtDirLocation = GetSquareAtDirection(dir);
+            // Check if this location exists
+            if (squareAtDirLocation.x < 0 || squareAtDirLocation.x >= MazeInfo.mazeInfo.squaresInfo.GetLength(0)
+                || squareAtDirLocation.y < 0 || squareAtDirLocation.y >= MazeInfo.mazeInfo.squaresInfo.GetLength(1))
+            { // Location out of bounds
+
+            }
+            else
+            { // This square exists
+
+                // Get the square
+                MazeSquare squareAtDir = MazeInfo.mazeInfo.squaresInfo[squareAtDirLocation.x, squareAtDirLocation.y];
+
+                // Check if the square at the direction has the openDirection pointing towards this one
+                if(squareAtDir.GetOpenDirection() == GetOppositeWall(dir))
+                { // A square that has opening to this one is found
+
+                    // Indicate that a square with opening to this one is fiund
+                    hasSquarePointingAtIt = true;
+                    // No need to search for other squares with opening to this one
+                    break;
+                }
+            }
+        }
+
+        return hasSquarePointingAtIt;
     }
 
     //************************************

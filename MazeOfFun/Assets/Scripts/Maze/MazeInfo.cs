@@ -5,16 +5,21 @@ using UnityEngine;
 public class MazeInfo
 {
     public static MazeInfo mazeInfo;
+    public static readonly int MAZE_EXTRA_SIZE = 3;
 
     public MazeSquare[,] squaresInfo;
-    private int _squareSize;
+    public float squareSize { get; private set; }
+    public int mazeSize { get; private set; }
+
+    public static Vector2Int playerStartSquareLocation;
+    public static Vector2Int exitSquareLocation;
 
     /// <summary>
     /// Create a maze info using singleton pattern. 
     /// </summary>
     /// <param name="level">Player level. The value should be greater than zero. </param>
     /// <param name="squareSize">Square size of the maze. The value should be greater than zero. </param>
-    public MazeInfo(int level, int squareSize)
+    public MazeInfo(int level, float squareSize)
     {
         // Syncronization to avoid the creation of two mazes at the same time
         lock(this)
@@ -22,8 +27,9 @@ public class MazeInfo
             // Singleton pattern
             if(mazeInfo == null && level > 0)
             {
-                _InitialiseMazeSquaresInfo(level + 2, squareSize);
-                _squareSize = squareSize;
+                mazeSize = level + MAZE_EXTRA_SIZE;
+                _InitialiseMazeSquaresInfo(mazeSize, squareSize);
+                this.squareSize = squareSize;
                 mazeInfo = this;
             }
         }
@@ -34,7 +40,7 @@ public class MazeInfo
     /// </summary>
     /// <param name="mazeSize">The size of the maze. </param>
     /// <param name="squareSize">The size of the square. </param>
-    private void _InitialiseMazeSquaresInfo(int mazeSize, int squareSize)
+    private void _InitialiseMazeSquaresInfo(int mazeSize, float squareSize)
     {
         squaresInfo = new MazeSquare[mazeSize, mazeSize];
 
@@ -93,5 +99,25 @@ public class MazeInfo
         }
     }
 
-    
+    public static Vector2 GetSequareCenterPosition(Vector2Int squareIndex)
+    {
+        Debug.Log("Square Index: " + squareIndex);
+        float squareSize = mazeInfo.squareSize;
+        float groundSize = squareSize * mazeInfo.mazeSize;
+        float x = squareSize / 2 + (squareIndex.x * squareSize) - groundSize / 2;
+        float y = squareSize / 2 + (squareIndex.y * squareSize) - groundSize / 2;
+
+        Debug.Log("Square Center Position: (" + x + ", " + y + ")" );
+        return new Vector2(x, y);
+    }
+
+    public static Vector2 GetPlayerStartPosition()
+    {
+        return GetSequareCenterPosition(playerStartSquareLocation);
+    }
+
+    public static Vector2 GetExitPosition()
+    {
+        return GetSequareCenterPosition(exitSquareLocation);
+    }
 }
