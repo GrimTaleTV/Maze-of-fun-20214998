@@ -5,15 +5,28 @@ using UnityEngine.SceneManagement;
 
 public class HealthSystem : MonoBehaviour
 {
+    public int maxHealth = 10;
     public int health = 10;
     public GameObject cube;
     public Material damageMat, normalMat;
+    public Material regenMat;
     private int countDown;
+    private int regenCount;
+    int twoSec = 120;
+    int tenSec = 1260;
+    int dead = 0;
+    int dmg = 1;
+    int gainHealth = 60;
 
     // Start is called before the first frame update
     void Start()
     {
         
+    }
+
+    private void awake() 
+    {
+        Application.targetFrameRate = 60;
     }
 
     // Update is called once per frame
@@ -24,35 +37,54 @@ public class HealthSystem : MonoBehaviour
             Material[] newMaterials = new Material[] { normalMat};
             cube.GetComponent<MeshRenderer>().materials = newMaterials;
         } else{
-            countDown -= 1;
+            countDown --;
         }
 
         
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            health -= 1;
-            countDown = 120;
+            health -= dmg;
+            countDown = twoSec;
+            
             Material[] newMaterials = new Material[] { damageMat};
             cube.GetComponent<MeshRenderer>().materials = newMaterials;
-            if (health <= 0)
+            if (health <= dead)
             {
             SceneManager.LoadScene("MenuScene");
             }
         }
-    }
 
+        if (health < maxHealth && regenCount == 0)
+        {
+            regenCount = tenSec;
+        }
+
+        if (health < maxHealth && regenCount > 0)
+        {
+            regenCount--;
+
+            if (regenCount == gainHealth)
+            {
+                health++;
+                Material[] newMaterials = new Material[] { regenMat};
+                cube.GetComponent<MeshRenderer>().materials = newMaterials;
+            }
+        }
+    }
+    /*
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Wall")
         {
-            countDown = 120;
+            countDown = twoSec;
             Material[] newMaterials = new Material[] { damageMat};
             cube.GetComponent<MeshRenderer>().materials = newMaterials;
-            health -= 1;
-            if (health <= 0)
+            health -= dmg;
+            if (health <= dead)
             {
                 SceneManager.LoadScene("MenuScene");
             }
         }
     }
+    */
 }
